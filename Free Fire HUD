@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Fire HUD</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* GRID BACKGROUND */
+.grid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(#111 1px, transparent 1px),
+                      linear-gradient(90deg, #111 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+}
+
+/* MIRA */
+.crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.crosshair::before,
+.crosshair::after {
+    content: "";
+    position: absolute;
+    background: #ff006e;
+    box-shadow: 0 0 10px #ff006e;
+}
+
+.crosshair::before {
+    width: 2px;
+    height: 30px;
+    left: 14px;
+    top: 0;
+}
+
+.crosshair::after {
+    width: 30px;
+    height: 2px;
+    top: 14px;
+    left: 0;
+}
+
+/* HUD ESQUERDA - VIDA E ESCUDO */
+.hud-left {
+    position: absolute;
+    bottom: 50px;
+    left: 30px;
+    width: 200px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ff006e;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #ffb703;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.stat-bar {
+    width: 100%;
+    height: 15px;
+    background: #222;
+    border: 1px solid #ff006e;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff006e, #ff4d94);
+    width: 100%;
+    box-shadow: 0 0 10px #ff006e;
+}
+
+.stat-bar-fill.health {
+    background: linear-gradient(90deg, #2ecc71, #27ae60);
+    box-shadow: 0 0 10px #2ecc71;
+}
+
+.stat-bar-fill.shield {
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    box-shadow: 0 0 10px #3498db;
+}
+
+.stat-value {
+    font-size: 11px;
+    color: #aaa;
+    text-align: right;
+}
+
+/* HUD DIREITA - MUNIÇÃO E ARMA */
+.hud-right {
+    position: absolute;
+    bottom: 50px;
+    right: 30px;
+    width: 220px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ff006e;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+}
+
+.weapon-info {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.weapon-name {
+    font-size: 14px;
+    color: #ffb703;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.ammo-display {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff006e;
+}
+
+.ammo-mag {
+    color: #ffb703;
+}
+
+.ammo-reserve {
+    color: #888;
+    font-size: 14px;
+}
+
+/* TOP CENTER - MINIMAP E DISTÂNCIA */
+.hud-top {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ff006e;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+}
+
+.distance-info {
+    font-size: 16px;
+    color: #ffb703;
+}
+
+.distance-value {
+    color: #ff006e;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* MINIMAPA */
+.minimap {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 150px;
+    height: 150px;
+    background: rgba(0, 20, 40, 0.8);
+    border: 2px solid #ff006e;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+    overflow: hidden;
+}
+
+.minimap::before {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #2ecc71;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #2ecc71;
+}
+
+.minimap-grid {
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 0, 110, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 110, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+/* ALERT AREA */
+.alert-area {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+.alert-text {
+    font-size: 24px;
+    color: #ff006e;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-shadow: 0 0 20px #ff006e;
+    opacity: 0;
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { opacity: 0; transform: scale(0.8); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.2); }
+}
+
+/* BOTÕES DE CONTROLE */
+.control-panel {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+}
+
+button {
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffb703;
+    border: 2px solid #ff006e;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(255, 0, 110, 0.2);
+}
+
+button:hover {
+    background: #ff006e;
+    color: #000;
+    box-shadow: 0 0 20px #ff006e;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* ABILITY COOLDOWN */
+.abilities {
+    position: absolute;
+    bottom: 180px;
+    left: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.ability {
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ff006e;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 10px rgba(255, 0, 110, 0.2);
+    transition: all 0.3s;
+}
+
+.ability:hover {
+    box-shadow: 0 0 20px #ff006e;
+    transform: scale(1.1);
+}
+
+.ability-cooldown {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffb703;
+    font-weight: bold;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="grid"></div>
+
+<!-- MINIMAP -->
+<div class="minimap">
+    <div class="minimap-grid"></div>
+</div>
+
+<!-- TOP CENTER - DISTÂNCIA -->
+<div class="hud-top">
+    <div class="distance-info">DISTÂNCIA</div>
+    <div class="distance-value" id="distance">125 m</div>
+</div>
+
+<!-- MIRA -->
+<div class="crosshair"></div>
+
+<!-- HUD ESQUERDA - VIDA -->
+<div class="hud-left">
+    <div class="stat-label">❤️ Vida</div>
+    <div class="stat-bar">
+        <div class="stat-bar-fill health" id="healthBar" style="width: 100%;"></div>
+    </div>
+    <div class="stat-value"><span id="healthValue">100</span>/100 HP</div>
+
+    <div class="stat-label" style="margin-top: 10px;">🛡️ Escudo</div>
+    <div class="stat-bar">
+        <div class="stat-bar-fill shield" id="shieldBar" style="width: 75%;"></div>
+    </div>
+    <div class="stat-value"><span id="shieldValue">75</span>/100 HP</div>
+</div>
+
+<!-- HUD DIREITA - MUNIÇÃO -->
+<div class="hud-right">
+    <div class="weapon-info">
+        <div class="weapon-name">🔫 AK47</div>
+        <div class="ammo-display">
+            <span class="ammo-mag" id="ammoMag">30</span>
+            <span>/</span>
+            <span class="ammo-reserve" id="ammoReserve">120</span>
+        </div>
+    </div>
+    
+    <div style="border-top: 1px solid #ff006e; padding-top: 10px; margin-top: 10px;">
+        <div class="stat-label">Municao</div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" id="ammoBar" style="width: 100%; background: linear-gradient(90deg, #ffb703, #ff8c00);"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ABILITIES -->
+<div class="abilities">
+    <div class="ability" onclick="useAbility(1)">⚡
+        <div class="ability-cooldown" id="cool1"></div>
+    </div>
+    <div class="ability" onclick="useAbility(2)">🛡️
+        <div class="ability-cooldown" id="cool2"></div>
+    </div>
+    <div class="ability" onclick="useAbility(3)">🔥
+        <div class="ability-cooldown" id="cool3"></div>
+    </div>
+</div>
+
+<!-- BOTÕES DE CONTROLE -->
+<div class="control-panel">
+    <button onclick="takeDamage()">Receber Dano</button>
+    <button onclick="shoot()">Atirar</button>
+    <button onclick="heal()">Curar</button>
+    <button onclick="showAlert()">Alert</button>
+</div>
+
+<script>
+let health = 100;
+let shield = 75;
+let ammoMag = 30;
+let ammoReserve = 120;
+let distance = 125;
+let abilityCooldowns = { 1: 0, 2: 0, 3: 0 };
+
+function updateHealth() {
+    document.getElementById('healthValue').textContent = health;
+    document.getElementById('healthBar').style.width = health + '%';
+}
+
+function updateShield() {
+    document.getElementById('shieldValue').textContent = shield;
+    document.getElementById('shieldBar').style.width = shield + '%';
+}
+
+function updateAmmo() {
+    document.getElementById('ammoMag').textContent = ammoMag;
+    document.getElementById('ammoReserve').textContent = ammoReserve;
+    
+    let totalAmmo = ammoMag + ammoReserve;
+    let ammoPercent = (totalAmmo / 150) * 100;
+    document.getElementById('ammoBar').style.width = Math.min(ammoPercent, 100) + '%';
+}
+
+function takeDamage() {
+    if (shield > 0) {
+        shield = Math.max(0, shield - 25);
+    } else {
+        health = Math.max(0, health - 25);
+    }
+    updateHealth();
+    updateShield();
+    
+    if (health <= 0) {
+        showAlert('💀 MORTE');
+        health = 100;
+        shield = 75;
+        updateHealth();
+        updateShield();
+    }
+}
+
+function heal() {
+    health = Math.min(100, health + 50);
+    shield = Math.min(100, shield + 50);
+    updateHealth();
+    updateShield();
+}
+
+function shoot() {
+    if (ammoMag > 0) {
+        ammoMag--;
+        updateAmmo();
+        showAlert('💥');
+    } else if (ammoReserve > 0) {
+        ammoMag = 30;
+        ammoReserve -= 30;
+        ammoMag--;
+        updateAmmo();
+        showAlert('🔄 RECARGA');
+    }
+}
+
+function showAlert(text = '⚡ ALERTA') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert-text';
+    alertDiv.textContent = text;
+    document.querySelector('.alert-area').appendChild(alertDiv);
+    
+    setTimeout(() => alertDiv.remove(), 1000);
+}
+
+function useAbility(num) {
+    if (abilityCooldowns[num] === 0) {
+        showAlert('⚡ HABILIDADE USADA');
+        abilityCooldowns[num] = 30;
+        updateCooldowns();
+    }
+}
+
+function updateCooldowns() {
+    for (let i = 1; i <= 3; i++) {
+        const coolDiv = document.getElementById('cool' + i);
+        if (abilityCooldowns[i] > 0) {
+            coolDiv.textContent = abilityCooldowns[i];
+            coolDiv.style.opacity = '1';
+        } else {
+            coolDiv.style.opacity = '0';
+        }
+    }
+}
+
+setInterval(() => {
+    for (let i = 1; i <= 3; i++) {
+        if (abilityCooldowns[i] > 0) {
+            abilityCooldowns[i]--;
+            updateCooldowns();
+        }
+    }
+}, 1000);
+
+// Atualizar distância aleatória
+setInterval(() => {
+    distance = Math.floor(Math.random() * 500) + 50;
+    document.getElementById('distance').textContent = distance + ' m';
+}, 3000);
+
+// Alert area
+const alertArea = document.createElement('div');
+alertArea.className = 'alert-area';
+document.body.appendChild(alertArea);
+
+// Inicializar
+updateHealth();
+updateShield();
+updateAmmo();
+</script>
+
+</body>
+</html>
