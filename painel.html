@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="painel-container">
+        <nav class="navbar">
+            <div class="navbar-header">
+                <h1>Painel Administrativo</h1>
+            </div>
+            <div class="navbar-user">
+                <span id="usuarioNome">Usuário</span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </nav>
+
+        <div class="painel-content">
+            <aside class="sidebar">
+                <ul class="menu">
+                    <li><a href="#dashboard" class="menu-item active" onclick="showTab('dashboard')">📊 Dashboard</a></li>
+                    <li><a href="#usuarios" class="menu-item" onclick="showTab('usuarios')">👥 Usuários</a></li>
+                    <li><a href="#configuracoes" class="menu-item" onclick="showTab('configuracoes')">⚙️ Configurações</a></li>
+                    <li><a href="#relatorios" class="menu-item" onclick="showTab('relatorios')">📈 Relatórios</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <!-- Dashboard -->
+                <div id="dashboard" class="tab-content active">
+                    <h2>Dashboard</h2>
+                    <div class="cards-container">
+                        <div class="card">
+                            <h3>Usuários Ativos</h3>
+                            <p class="card-number">1,234</p>
+                        </div>
+                        <div class="card">
+                            <h3>Acessos Hoje</h3>
+                            <p class="card-number">567</p>
+                        </div>
+                        <div class="card">
+                            <h3>Atividades</h3>
+                            <p class="card-number">89</p>
+                        </div>
+                        <div class="card">
+                            <h3>Problemas</h3>
+                            <p class="card-number">3</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuários -->
+                <div id="usuarios" class="tab-content">
+                    <h2>Gerenciar Usuários</h2>
+                    <button class="btn-primary" onclick="addUsuario()">+ Novo Usuário</button>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuariosTable">
+                            <tr>
+                                <td>1</td>
+                                <td>João Silva</td>
+                                <td>joao@email.com</td>
+                                <td><span class="status-ativo">Ativo</span></td>
+                                <td>
+                                    <button class="btn-sm btn-edit">Editar</button>
+                                    <button class="btn-sm btn-delete">Deletar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Maria Santos</td>
+                                <td>maria@email.com</td>
+                                <td><span class="status-ativo">Ativo</span></td>
+                                <td>
+                                    <button class="btn-sm btn-edit">Editar</button>
+                                    <button class="btn-sm btn-delete">Deletar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Configurações -->
+                <div id="configuracoes" class="tab-content">
+                    <h2>Configurações do Sistema</h2>
+                    <form class="form-config">
+                        <div class="form-group">
+                            <label>Nome do Painel:</label>
+                            <input type="text" value="Painel Administrativo">
+                        </div>
+                        <div class="form-group">
+                            <label>Email de Suporte:</label>
+                            <input type="email" value="suporte@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Tema:</label>
+                            <select>
+                                <option>Claro</option>
+                                <option>Escuro</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Salvar Alterações</button>
+                    </form>
+                </div>
+
+                <!-- Relatórios -->
+                <div id="relatorios" class="tab-content">
+                    <h2>Relatórios</h2>
+                    <div class="relatorio-box">
+                        <h3>Relatório de Acessos</h3>
+                        <p>Total de acessos no mês: <strong>15,234</strong></p>
+                        <p>Média diária: <strong>491</strong> acessos</p>
+                    </div>
+                    <div class="relatorio-box">
+                        <h3>Relatório de Usuários</h3>
+                        <p>Novos usuários: <strong>45</strong></p>
+                        <p>Usuários inativos: <strong>12</strong></p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="painel.js"></script>
+</body>
+</html>
