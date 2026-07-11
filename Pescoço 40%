@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treino de Mira - Head Level</title>
+
+<style>
+body {
+    margin: 0;
+    background: #0a0a0a;
+    overflow: hidden;
+    font-family: Arial;
+    color: white;
+}
+
+/* GRID */
+.grid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(#111 1px, transparent 1px),
+                      linear-gradient(90deg, #111 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* MIRA */
+.crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+}
+
+.crosshair::before,
+.crosshair::after {
+    content: "";
+    position: absolute;
+    background: red;
+    box-shadow: 0 0 8px red;
+}
+
+.crosshair::before {
+    width: 2px;
+    height: 20px;
+    left: 9px;
+}
+
+.crosshair::after {
+    width: 20px;
+    height: 2px;
+    top: 9px;
+}
+
+/* LINHA DO PESCOÇO */
+.neck-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: red;
+    box-shadow: 0 0 10px red;
+    top: 50%;
+}
+
+/* PAINEL */
+.panel {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    border: 1px solid red;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px red;
+}
+
+button {
+    margin-top: 10px;
+    padding: 8px;
+    background: black;
+    color: white;
+    border: 1px solid red;
+    cursor: pointer;
+}
+
+button:hover {
+    background: red;
+}
+
+input {
+    width: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="grid"></div>
+<div class="crosshair"></div>
+<div class="neck-line" id="line"></div>
+
+<div class="panel">
+    <h3>TREINO DE MIRA</h3>
+    <input type="range" min="10" max="90" value="50" id="slider">
+    <button onclick="toggleLine()">Mostrar/Ocultar Linha</button>
+</div>
+
+<script>
+let slider = document.getElementById("slider");
+let line = document.getElementById("line");
+
+slider.addEventListener("input", () => {
+    line.style.top = slider.value + "%";
+});
+
+function toggleLine() {
+    if (line.style.display === "none") {
+        line.style.display = "block";
+    } else {
+        line.style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
